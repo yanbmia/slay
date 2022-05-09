@@ -16,5 +16,7 @@ apple_img = pygame.image.load('apple.png')
 spawn = True
 
 def apple():
-  pygame.draw.rect(Controller.game_window, 'red',
-                     pygame.Rect(position[0], position[1], 40, 40))
+  pygame.draw.rect(Controller.game_window, 'white',
+                     pygame.Rect(position[0], position[1], 0.5, 0.5))
+  Controller.game_window.blit(apple_img, position)
+
