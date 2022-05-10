@@ -3,21 +3,41 @@ import pygame
 import time
 import random
 
-from src import snake
-from src import apple
+snake_speed = 5
 
+# Initialising pygame
 pygame.init()
 
+# Window size
 window_x = 480
 window_y = 480
 
 game_window = pygame.display.set_mode((window_x, window_y))
+
 background = pygame.image.load("background.jpg")
 
-# frames/sec controller
+# frames / second controller
 fps = pygame.time.Clock()
 
-# setting default snake direction towards rihgt
+# defining snake default position
+snake_position = [0, 0]
+
+# defining first 4 blocks of snake body
+snake_body = [[100, 42.5]]
+
+# fruit position
+x_coordinates = [0,40,80,120,160,200,240,280,320,360,400,440]
+y_coordinates = [0,40,80,120,160,200,240,280,320,360,400,440]
+
+apple_position = [
+    random.choice(x_coordinates),
+    random.choice(y_coordinates)
+]
+
+apple_img = pygame.image.load('apple.png')
+apple_spawn = True
+
+# setting default snake direction towards
 direction = 'RIGHT'
 change_to = direction
 
@@ -49,6 +69,15 @@ def game_over():
     pygame.quit()
     quit()
 
+def snake():
+  pygame.draw.rect(game_window, 'forestgreen',
+                         pygame.Rect(pos[0], pos[1], 40, 40))
+
+def apple():
+  pygame.draw.rect(game_window, 'gray',
+                     pygame.Rect(apple_position[0], apple_position[1], 0.5, 0.5))
+  game_window.blit(apple_img, apple_position)
+
 
 # Main Function
 while True:
@@ -77,49 +106,54 @@ while True:
 
     # user controlled snake
     if direction == 'UP':
-        snake.position[1] -= 40
+        snake_position[1] -= 40
     if direction == 'DOWN':
-        snake.position[1] += 40
+        snake_position[1] += 40
     if direction == 'LEFT':
-        snake.position[0] -= 40
+        snake_position[0] -= 40
     if direction == 'RIGHT':
-        snake.position[0] += 40
+        snake_position[0] += 40
 
     # snake growing
-    snake.body.insert(0, list(snake.position))
-    if snake.position[0] == apple.position[0] and snake.position[
-            1] == apple.position[1]:
+    snake_body.insert(0, list(snake_position))
+    if snake_position[0] == apple_position[0] and snake_position[
+            1] == apple_position[1]:
         score += 1
-        apple.spawn = False
+        apple_spawn = False
     else:
-        snake.body.pop()
+        snake_body.pop()
 
-    if not apple.spawn:
-        apple.position = [
-            random.choice(apple.x_coordinates),
-            random.choice(apple.y_coordinates)
+    if not apple_spawn:
+        apple_position = [
+            random.choice(x_coordinates),
+            random.choice(y_coordinates)
         ]
 
-    apple.spawn = True
+    apple_spawn = True
   
     #snake & apple location!
-    for pos in snake.body:
-      snake.snake()
-      apple.apple()
+    for pos in snake_body:
+      snake()
+
 
     # for when the snake dies :(
-    if snake.position[0] < 0 or snake.position[0] > window_x - 10:
+    if snake_position[0] < 0 or snake_position[0] > window_x - 10:
         game_over()
-    if snake.position[1] < 0 or snake.position[1] > window_y - 10:
+    if snake_position[1] < 0 or snake_position[1] > window_y - 10:
         game_over()
 
     # eating the apple!
-    for block in snake.body[1:]:
-        if snake.position[0] == block[0] and snake.position[1] == block[1]:
+    for block in snake_body[1:]:
+        if snake_position[0] == block[0] and snake_position[1] == block[1]:
             game_over()
 
     # what's the score lol
     show_score(1, 'white', 'times new roman', 20)
 
     pygame.display.update()
-    fps.tick(snake.speed)
+    fps.tick(snake_speed)
+  
+    # increases speed when the score more than 10
+    if score > 10:
+      snake_speed += 2.5
+      fps.tick(snake_speed)
