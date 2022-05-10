@@ -3,12 +3,11 @@ import pygame
 import time
 import random
 
-snake_speed = 5
 
-# Initialising pygame
+
 pygame.init()
+fps = pygame.time.Clock()
 
-# Window size
 window_x = 480
 window_y = 480
 
@@ -16,16 +15,13 @@ game_window = pygame.display.set_mode((window_x, window_y))
 
 background = pygame.image.load("background.jpg")
 
-# frames / second controller
-fps = pygame.time.Clock()
 
-# defining snake default position
+# snake
 snake_position = [0, 0]
-
-# defining first 4 blocks of snake body
 snake_body = [[100, 42.5]]
+snake_speed = 5
 
-# fruit position
+# apple
 x_coordinates = [0,40,80,120,160,200,240,280,320,360,400,440]
 y_coordinates = [0,40,80,120,160,200,240,280,320,360,400,440]
 
@@ -35,17 +31,15 @@ apple_position = [
 ]
 
 apple_img = pygame.image.load('apple.png')
-apple_spawn = True
+apple_regenerate = True
 
-# setting default snake direction towards
+# setting the direction
 direction = 'RIGHT'
 change_to = direction
 
-# initial score
 score = 0
 
-
-# displaying Score function
+# showing the score
 def show_score(choice, color, font, size):
     score_font = pygame.font.SysFont(font, size)
     score_surface = score_font.render('Score : ' + str(score), True, color)
@@ -53,7 +47,7 @@ def show_score(choice, color, font, size):
     game_window.blit(score_surface, score_rect)
 
 
-# game over function
+# end screen - game over 
 def game_over():
     my_font = pygame.font.SysFont('times new roman', 20)
     game_over_surface = my_font.render('Game Over | Score: ' + str(score),
@@ -94,15 +88,16 @@ while True:
             if event.key == pygame.K_RIGHT:
                 change_to = 'RIGHT'
 
-    # for when multiple clicks are pressed
-    if change_to == 'UP' and direction != 'DOWN':
-        direction = 'UP'
-    if change_to == 'DOWN' and direction != 'UP':
-        direction = 'DOWN'
+    # if multiple keys are clicked
     if change_to == 'LEFT' and direction != 'RIGHT':
         direction = 'LEFT'
     if change_to == 'RIGHT' and direction != 'LEFT':
         direction = 'RIGHT'
+    if change_to == 'UP' and direction != 'DOWN':
+        direction = 'UP'
+    if change_to == 'DOWN' and direction != 'UP':
+        direction = 'DOWN'
+
 
     # user controlled snake
     if direction == 'UP':
@@ -119,21 +114,22 @@ while True:
     if snake_position[0] == apple_position[0] and snake_position[
             1] == apple_position[1]:
         score += 1
-        apple_spawn = False
+        apple_regenerate = False
     else:
         snake_body.pop()
 
-    if not apple_spawn:
+    if not apple_regenerate:
         apple_position = [
             random.choice(x_coordinates),
             random.choice(y_coordinates)
         ]
 
-    apple_spawn = True
+    apple_regenerate = True
   
     #snake & apple location!
     for pos in snake_body:
       snake()
+      apple()
 
 
     # for when the snake dies :(
@@ -142,18 +138,18 @@ while True:
     if snake_position[1] < 0 or snake_position[1] > window_y - 10:
         game_over()
 
-    # eating the apple!
+    # eating the apple! munch munch
     for block in snake_body[1:]:
         if snake_position[0] == block[0] and snake_position[1] == block[1]:
             game_over()
 
-    # what's the score lol
+    # THE score !!
     show_score(1, 'white', 'times new roman', 20)
 
     pygame.display.update()
     fps.tick(snake_speed)
   
-    # increases speed when the score more than 10
-    if score > 10:
-      snake_speed += 2.5
+    # increases speed when the score more than 5
+    if score > 5:
+      snake_speed += 1
       fps.tick(snake_speed)
